@@ -6,7 +6,9 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-setwd("C:/Users/KRISHNA/OneDrive/Documents/8600_Coursework")
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir= normalizePath('..'))
+setwd(normalizePath(".."))
 library(ProjectTemplate)
 load.project()
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
