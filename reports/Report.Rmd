@@ -1,30 +1,26 @@
 ---
-title: "Coursework"
+title: "FutureLearn Video Engagement Analysis"
 author: "Krishnanand Sagar"
 date: "`r Sys.Date()`"
-output: pdf_document,html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/KRISHNA/OneDrive/Documents/8600_Coursework")
+library(ProjectTemplate)
+load.project()
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
+#Business Understanding 
 
-## R Markdown
+#Data Understanding
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+#Data Preparation
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+#Modelling - Cycle 1
 
-```{r cars}
-summary(cars)
-```
+#Evaluation - Cycle 1
 
-## Including Plots
+#Cycle 2 - Refinement
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#Conclusion
