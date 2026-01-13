@@ -8,28 +8,28 @@ library(tidyverse)
  data<- read_csv("data/clean/joined_cycle1.csv")
  
  
+ 
 # ----Learner Level Persistence----
-learner_persistence <- data %>%
-   group_by(country,learner_id) %>%
-   summarise(
-     steps_completed=sum(!is.na(last_completed_at)),
-     total_steps = n(),
-     completion_rate = steps_completed/total_steps,
-     .groups = "drop"
-   )
-
+ learner_persistence <- data %>%
+   filter(!is.na(country)) %>%
+   group_by(country, learner_id) %>%
+   dplyr::summarise(
+     max_step_reached = max(step_number, na.rm = TRUE)
+   ) %>%
+   ungroup()
+ 
+ 
 # ----Country level matrics----
-country_metrics <- learner_persistence %>%
+ country_metrics <- learner_persistence %>%
    group_by(country) %>%
    summarise(
      learners = n(),
-     avg_steps_completed = mean(steps_completed),
-     median_steps_completed = median(steps_completed),
-     dropout_rate = mean(completion_rate < 0.3),
-     .groups = "drop"
-   )%>%
-   arrange(desc(avg_steps_completed))
+     avg_max_step = mean(max_step_reached),
+     median_max_step = median(max_step_reached),
+     early_dropout_rate = mean(max_step_reached <= 2)
+   )
  
-
+ 
 # ----Save----
 write_csv(country_metrics,"data/clean/country_metrics_cycle1.csv")
+write_csv(country_metrics,"cache/country_metrics_cycle1.csv")

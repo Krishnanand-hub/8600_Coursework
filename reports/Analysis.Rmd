@@ -1,8 +1,7 @@
-# ====================================
 Title : Learner Persistence by Country
 Author : Krishnanand Sagar
 output : pdf_document
-# ====================================
+
 
 ## 1. Business Understanding - Cycle 1
  
@@ -11,5 +10,45 @@ output : pdf_document
 ## 3. Data Preparation
 
 ## 4. Analysis - Cycle 1
+
+```{r}
+library(tidyverse)
+
+country_metrics<-read_csv("../cache/country_metrics_cycle1.csv")
+
+country_metrics %>%
+  slice_max(avg_steps_completed, n=5)%>%
+  ggplot(aes(
+    x = reorder(country,avg_steps_completed),
+    y = avg_steps_completed
+))+
+geom_col()+
+coord_flip()+
+labs(
+  title = "Top 5 countries by average steps completed",
+  x = "Country",
+  y = "Average Steps Completed"
+)
+```
+```{r}
+country_metrics %>%
+  slice_max(dropout_rate,n=5) %>%
+  ggplot(aes(
+    x = reorder(country, dropout_rate),
+    y = dropout_rate
+  )) +
+  geom_col()+
+  coord_flip()+
+  labs(
+    title = "Top 5 Countries by dropout rate",
+    x = "Country",
+    y = "Dropout Rate"
+  
+  )
+```
+
+
+
+
 
 ## 5. Evaluation - Cycle 1
