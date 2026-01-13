@@ -1,0 +1,15 @@
+# ====================================
+Title : Learner Persistence by Country
+Author : Krishnanand Sagar
+output : pdf_document
+# ====================================
+
+## 1. Business Understanding - Cycle 1
+ 
+## 2. Data Understanding
+
+## 3. Data Preparation
+
+## 4. Analysis - Cycle 1
+
+## 5. Evaluation - Cycle 1
