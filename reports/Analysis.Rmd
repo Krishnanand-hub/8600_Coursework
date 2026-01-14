@@ -5,173 +5,195 @@ date: "`r Sys.Date()`"
 output: pdf_document
 ---
 
-## 1. Business Understanding - Cycle 1
-The objective of this analysis is to understand how learner persistent varies across countries in an online course from a provider perspective identifying countries where learners remain engaged for longer verses those where learners drop out early can inform strategic decisions across course delivery market focus and engagement interventions
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir= normalizePath('..'))
 
-Specifically this cycle aims:
-Compare learner persistent across
-Identify countries with high early
-Provide evidence to support targeted engagement strategies in later analysis cycles
+```
+```{r, include=FALSE}
+library(ProjectTemplate)
+load.project()
+```
+
+
+## 1. Business Understanding - Cycle 1
+The objective of this analysis is to explore how learner persistence varies across countries in a FutureLearn massive open online course (MOOC). From a course provider perspective, understanding where learners remain engaged versus where they disengage early can inform strategic decisions related to course delivery, market focus, and learner support interventions.
+
+Stakeholder:
+FutureLearn and partner course providers.
+
+Stakeholder Interest:
+Improving learner engagement and completion rates, and identifying regions where targeted interventions may improve outcomes and potential revenue.
+
+Success Criteria:
+
+-Identify variation in learner persistence across countries
+
+-Identify countries with high early dropout rates
+
+-Generate insights that motivate a second, stakeholder-focused investigation
 
  
 ## 2. Data Understanding
-The analysis uses country level persistent metrics derived from learner step activity data each learner's engagement is represented by the maximum step reached during the course capturing how far they progressed before disengaging
-Key variables used in the Analysis include
-Country detected learner country
-Learner's number of learners per country
-Average max step average maximum step reached by learners In the country
-Pearly drop out rate proportion of learners disengaging within the first two steps
-These variables allow both overall persistent and early disengagement behaviour to be examined at the country level
+This analysis uses country-level persistence metrics derived from learner step-level activity data. Learner persistence is represented by the maximum step reached during the course, capturing how far a learner progressed before disengaging.
+
+Key variables include:
+
+country: learner’s detected country
+
+learners: number of learners per country
+
+avg_max_step: average maximum step reached
+
+early_dropout_rate: proportion of learners disengaging within the first two steps
+
+These variables allow both overall engagement depth and early disengagement behaviour to be examined at the country level.
 
 
 
 
 ## 3. Data Preparation
-Learner step activity data were cleaned with philtre to remove missing country information for each learner the maximum step reached was calculated to represent persistence these learner level values were then aggregated by contrary to produce summary matrix including average persistence and early dropout rate the resulting country level data set was saved to disc and used consistently across all analysis to ensure reproducibility and separation between data preparation and analysis stage
+Learner step-level activity data were cleaned to remove missing country information. For each learner, the maximum step reached was calculated to represent persistence. These learner-level values were then aggregated by country to produce summary metrics including average persistence and early dropout rates.
+
+All data preparation was performed using ProjectTemplate munge scripts, and derived datasets were saved and reused consistently to ensure reproducibility and separation between preparation and analysis stages.
 
 
 ## 4. Analysis - Cycle 1
-The first plot examines variation in learner persistent across countries by focusing on the 10 countries with the largest number of learners using average maximum step reached this visualisation highlights how far learners typically progress in different region while ensuring comparisons are based on sufficiently large learner populations the second plot focuses on early dropout behaviour showing the proportion of learners who disengage early versus those who remain active beyond the initial steps countries are ordered by early dropout rate allowing direct comparison of engagement composition across regionstogether these plots provide complementary perspective one summarising overall persistence depth and other revealing how engagement breaks down at the earliest stage of the course
+The first analysis examines variation in learner persistence across countries, focusing on the ten countries with the largest learner populations to ensure meaningful comparisons. Average maximum step reached is used to summarise how far learners typically progress.
 
+The second analysis examines early dropout behaviour by comparing the proportion of learners who disengage early versus those who remain active beyond the initial steps. Countries are ordered by early dropout rate to enable direct comparison.
+
+Together, these plots provide complementary perspectives on overall persistence depth and early disengagement patterns.
+
+*Figure 1 presents the average maximum step reached by learners across the ten countries with the largest learner populations. Focusing on high-volume countries ensures that persistence comparisons are not driven by small sample sizes and highlights meaningful differences in learner engagement depth.
 
 ```{r}
-library(tidyverse)
-
-country_metrics<-read_csv("../cache/country_metrics_cycle1.csv")
-
 country_metrics %>%
-  slice_max(learners, n = 10) %>%   # top 10 by volume, not performance
-  ggplot(aes(x = reorder(country, avg_max_step), y = avg_max_step)) +
-  geom_boxplot() +
-  coord_flip() +
-  labs(
-    title = "Variation in Learner Persistence Across Countries",
-    x = "Country",
-    y = "Average Maximum Step Reached"
-  )
+slice_max(learners, n = 10) %>%
+ggplot(aes(x = reorder(country, avg_max_step), y = avg_max_step)) +
+geom_boxplot() +
+coord_flip() +
+labs(
+title = "Variation in Learner Persistence Across Countries",
+x = "Country",
+y = "Average Maximum Step Reached"
+)
+
 
 ```
+The figure shows substantial variation in learner persistence across countries, with some countries exhibiting consistently higher progression through the course than others.
+
+*Figure 2 decomposes learner engagement into early dropout and retained learners, allowing a clearer examination of disengagement patterns at the earliest stages of the course.
 ```{r}
 country_metrics %>%
-  arrange(desc(early_dropout_rate)) %>%
-  mutate(
-    country = factor(country, levels = country),
-    early = early_dropout_rate,
-    retained = 1 - early_dropout_rate
-  ) %>%
-  select(country, early, retained) %>%
-  pivot_longer(
-    cols = c(early, retained),
-    names_to = "status",
-    values_to = "proportion"
-  ) %>%
-  ggplot(aes(
-    x = country,
-    y = proportion,
-    fill = status
-  )) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Early Dropout vs Retained Learners by Country",
-    x = "Country",
-    y = "Proportion of Learners"
-  ) +
-  theme(
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank()
-  )
+arrange(desc(early_dropout_rate)) %>%
+mutate(
+country = factor(country, levels = country),
+early = early_dropout_rate,
+retained = 1 - early_dropout_rate
+) %>%
+select(country, early, retained) %>%
+pivot_longer(
+cols = c(early, retained),
+names_to = "status",
+values_to = "proportion"
+) %>%
+ggplot(aes(x = country, y = proportion, fill = status)) +
+geom_col() +
+coord_flip() +
+labs(
+title = "Early Dropout vs Retained Learners by Country",
+x = "Country",
+y = "Proportion of Learners"
+) +
+theme(
+axis.text.y = element_blank(),
+axis.ticks.y = element_blank()
+)
+
 ```
 
-
-
+Countries with high early dropout proportions show disengagement occurring very early, suggesting that initial course structure or accessibility may present barriers to sustained participation.
 
 
 ## 5. Evaluation - Cycle 1
-The analysis demonstrates clear difference in learner persistent patterns across country some countries show relatively high average progression through the course indicating sustained learner engagement while other exhibit high early dropout rates suggesting disengagement occurs very quickly
-From a business perspective
-Countries with stronger persistent represent stable markets for fully online course delivery
-Country with high early dropouts may face barriers such as accessibility expectations mismatch or insufficient early support
+The analysis reveals clear differences in learner persistence across countries. Some countries exhibit higher average progression through the course, indicating sustained engagement, while others show high early dropout rates, suggesting disengagement occurs very early.
 
-These findings justify further investigation in cycle two were targeted strategies can be evaluated to improve engagement and reduce early dropout in low persistent regions
+From a business perspective:
 
+High-persistence countries represent stable markets for fully online delivery
 
-## Cycle 2: Business Understanding
+High early-dropout countries may face accessibility barriers, expectation mismatches, or insufficient early support
 
-The objective of Cycle 2 is to translate the country-level learner persistence patterns identified in Cycle 1 into actionable strategic insights for course providers. Specifically, this cycle evaluates whether countries exhibiting low learner persistence may benefit from offline or blended learning interventions aimed at improving learner engagement and potential revenue.
+These findings motivate a second investigation focused on identifying and addressing low-persistence regions.
 
 
-## Cycle 2: Data Understanding
+## Business Understanding - Cycle 2
 
-Cycle 2 reuses the country-level persistence metrics derived in Cycle 1. No additional datasets are introduced. The analysis is based on aggregated learner persistence indicators, including average maximum step reached and early dropout rates by country.
+The objective of Cycle 2 is to translate persistence patterns identified in Cycle 1 into actionable insights for stakeholders. Specifically, this cycle evaluates whether countries with low learner persistence may benefit from offline or blended learning interventions aimed at improving engagement and completion.
 
-## Cycle 2: Modelling / Analysis
 
-Segmentation Approach-
-Rather than predictive modelling, this cycle applies a rule-based segmentation approach to classify countries into persistence categories. Countries are categorised as low, medium, or high persistence based on interpretable thresholds applied to learner engagement and early dropout rates, supporting clear stakeholder decision-making.
+## Data Understanding - Cycle 2
 
-Country Classification
-Countries were classified using quantile-based thresholds applied to average learner progression and early dropout rates.
+The objective of Cycle 2 is to translate persistence patterns identified in Cycle 1 into actionable insights for stakeholders. Specifically, this cycle evaluates whether countries with low learner persistence may benefit from offline or blended learning interventions aimed at improving engagement and completion.
+
+## Modelling / Analysis - Cycle 2
+
+Rather than predictive modelling, this cycle applies a rule-based segmentation approach. Countries are classified into low, medium, or high persistence categories using quantile-based thresholds applied to learner progression and early dropout rates. This approach prioritises interpretability for stakeholders.
 
 ```{r}
-country_cycle2 <- read_csv("../cache/country_cycle2_classification.csv")
-
+country_cycle2
 ```
-## Cycle 2: Results and Visualisation
+## Results and Visualisation - Cycle 2
 
-Learner Engagement by Country
-Figure X shows average learner progression by country, highlighting countries with low persistence that may benefit from targeted offline or blended learning interventions.
-
+*Figure 3 summarises average learner progression by country, segmented by persistence category. This visualisation highlights countries identified as low persistence and supports stakeholder prioritisation of intervention targets.
 ```{r}
 ggplot(
-  country_cycle2,
-  aes(x = reorder(country, avg_max_step), y = avg_max_step, fill = persistence_category)
+country_cycle2,
+aes(x = reorder(country, avg_max_step),
+y = avg_max_step,
+fill = persistence_category)
 ) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Average Learner Progression by Country",
-    x = "Country",
-    y = "Average Maximum Step Reached"
-  )
+geom_col() +
+coord_flip() +
+labs(
+title = "Average Learner Progression by Country",
+x = "Country",
+y = "Average Maximum Step Reached"
+)
+
 
 ```
 
 
-
-Early Dropout and Engagement Relationship
-Figure Y examines the relationship between learner engagement and early dropout rates across countries.
-
+*Figure 4 illustrates the relationship between average learner progression and early dropout rates, providing a complementary view of engagement dynamics across persistence categories.
 ```{r}
 ggplot(
-  country_cycle2,
-  aes(x = avg_max_step, y = early_dropout_rate, color = persistence_category)
+country_cycle2,
+aes(x = avg_max_step,
+y = early_dropout_rate,
+color = persistence_category)
 ) +
-  geom_point(size = 3) +
-  labs(
-    title = "Early Dropout Rate vs Learner Engagement",
-    x = "Average Maximum Step Reached",
-    y = "Early Dropout Rate"
-  )
-
+geom_point(size = 3) +
+labs(
+title = "Early Dropout Rate vs Learner Engagement",
+x = "Average Maximum Step Reached",
+y = "Early Dropout Rate"
+)
 ```
 
 
-Low Persistence Countries
-Table Z lists countries classified as low persistence, representing potential candidates for targeted offline or blended learning interventions.
-
+*Table 1 lists countries classified as low persistence, representing priority candidates for targeted offline or blended learning interventions.
 ```{r}
-low_persistence_countries <- read_csv("../cache/low_persistence_countries.csv")
 low_persistence_countries
-
 ```
 
 
-## Cycle 2: Evaluation
-Countries classified as low persistence exhibit both low average learner progression and high early dropout rates. These patterns suggest the presence of structural or contextual barriers rather than a lack of learner interest. Offline or blended learning models may reduce these barriers by improving accessibility, engagement, and course completion, thereby increasing the likelihood of certificate purchases and associated revenue.
+## Evaluation - Cycle 2
+Countries classified as low persistence exhibit both low average learner progression and high early dropout rates. These patterns suggest the presence of structural or contextual barriers rather than a lack of learner interest.
 
 
-## Cycle 2: Deployment and Recommendations
+## Deployment and Recommendations
 It is recommended that course providers pilot offline or blended learning initiatives in selected low-persistence countries identified in this analysis. Cycle 1 persistence metrics should be retained as a baseline, and the same analytical framework reapplied post-intervention to evaluate changes in learner engagement, dropout rates, and potential revenue impact.
 
 

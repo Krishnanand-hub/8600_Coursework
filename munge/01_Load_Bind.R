@@ -1,34 +1,31 @@
 # ====================================================
 # 01_Load_Bind.R
-# Load and bind all enrolment and step-level CSV files
-# Cycle 1: DATA INGESTION only
+# Bind auto-loaded enrolment and step-level data
+# Cycle 1: DATA INGESTION
 # ====================================================
 
-library(tidyverse)
+# ---- Bind enrolment files ----
+enrolments <- list(
+  cyber.security.1_enrolments,
+  cyber.security.2_enrolments,
+  cyber.security.3_enrolments,
+  cyber.security.4_enrolments,
+  cyber.security.5_enrolments,
+  cyber.security.6_enrolments,
+  cyber.security.7_enrolments
+) %>% bind_rows()
 
-dir.create("data/clean", recursive = TRUE, showWarnings = FALSE)
+# ---- Bind step-level activity files ----
+step_activity <- list(
+  cyber.security.1_step.activity,
+  cyber.security.2_step.activity,
+  cyber.security.3_step.activity,
+  cyber.security.4_step.activity,
+  cyber.security.5_step.activity,
+  cyber.security.6_step.activity,
+  cyber.security.7_step.activity
+) %>% bind_rows()
 
-# ----Enrolment Files ----
-enrolment_files <- list.files(
-  "data/raw",
-  pattern = "_enrolments\\.csv$",
-  full.names = TRUE
-)
-
-enrolments <- enrolment_files %>%
-  map_dfr(read_csv)
-
-# ----Step-Level activity files----
-step_files <- list.files(
-  "data/raw",
-  pattern = "_step-activity\\.csv$",
-  full.names = TRUE
-)
-
-step_activity<- step_files %>%
-  map_dfr(read_csv)
-
-#----Save raw bound data----
-write_csv(enrolments,"data/clean/enrolments_bounds.csv")
-write_csv(step_activity,"data/clean/step_activity_bound.csv")
-
+# ---- Save bound data ----
+write_csv(enrolments, "data/clean/enrolments_bounds.csv")
+write_csv(step_activity, "data/clean/step_activity_bounds.csv")
