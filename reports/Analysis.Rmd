@@ -16,56 +16,83 @@ load.project()
 ```
 
 
-## 1. Business Understanding - Cycle 1
-The objective of this analysis is to explore how learner persistence varies across countries in a FutureLearn massive open online course (MOOC). From a course provider perspective, understanding where learners remain engaged versus where they disengage early can inform strategic decisions related to course delivery, market focus, and learner support interventions.
 
-Stakeholder:
-FutureLearn and partner course providers.
 
-Stakeholder Interest:
-Improving learner engagement and completion rates, and identifying regions where targeted interventions may improve outcomes and potential revenue.
+## Introduction
 
-Success Criteria:
+Learning Analytics focus on the measurement, collection, analysis and reporting of data about learners and their contexts in order to understand and optimize learning experiences. Massive Open Online Courses (MOOCS) such as those offered by FutureLearn, generate large volumes of learner interaction data that provide valuable opportunities to study engagement and persistence at scale.
 
--Identify variation in learner persistence across countries
+Learner engagement is a critical concern for MOOC providers, as low persistent and high dropout rates can limit both educational impact and commercial sustainability. Understanding how engagement patterns vary across learner populations can help providers make informed decisions about course designs, delivery methods, and market focus.
 
--Identify countries with high early dropout rates
+The aim of this report is to Is to analyse learner persistent across countries using FutureLearn course data. The analysis follows CRISP-DM framework and is conducted across two iterative cycles. Cycle 1 focuses on identifying patterns of learner persistence by country, while Cycle 2 builds on these findings to generate stakeholder-oriented recommendations.
 
--Generate insights that motivate a second, stakeholder-focused investigation
+
+
+
+## Business Understanding (CRISP-DM Cycle 1)
+
+From the perspective of FutureLearn and its partner course providers learner persistence is a key indicator of course effectiveness and learner satisfaction. High dropout rates may signal issues such as accessibility barriers, mismatched learner expectations or insufficient early stage support.
+
+Stakeholders are interested In understanding:
+
+1.Where learners tend to remain engaged throughout a course
+2.Where disengagement occurs early
+3.How these patterns vary geographically
+
+Research questions - Cycle 1
+
+1.How does letter persistence differ across countries?
+2.Which countries show particularly high dropout rates?
+
+The goal of Cycle 1 is descriptive: to identify meaningful differences in persistence that can inform further investigation.
+
 
  
-## 2. Data Understanding
-This analysis uses country-level persistence metrics derived from learner step-level activity data. Learner persistence is represented by the maximum step reached during the course, capturing how far a learner progressed before disengaging.
 
-Key variables include:
+## Data Understanding (CRISP-DM Cycle 1)
 
-country: learner’s detected country
+The analysis uses data from a FutureLearn MOOC, combining learner enrolment information with step-level activity data. Multiple cores runs were included to increase coverage and robustness.
 
+Learners are uniquely identified using a learner_id, Which allows enrollment data to be linked to step level engagement records. The primary focus is on learner progression through course steps.
+
+Key variables used in analysis include:
+
+country: detected learner country
 learners: number of learners per country
-
 avg_max_step: average maximum step reached
-
 early_dropout_rate: proportion of learners disengaging within the first two steps
 
-These variables allow both overall engagement depth and early disengagement behaviour to be examined at the country level.
+Initial exploration revealed missing country values and highly imbalanced country sample sizes, both of which influenced later preprocessing decisions. After cleaning and aggregation, the dataset contains learner activity records summarized into country level observations. The final analytical data sets consist of approximately 190 country level rows with a small number of numeric variables and categorical variables. The aggregation allows comparison of engagement patterns across countries while reducing noise from individual level variability.
 
 
 
 
-## 3. Data Preparation
-Learner step-level activity data were cleaned to remove missing country information. For each learner, the maximum step reached was calculated to represent persistence. These learner-level values were then aggregated by country to produce summary metrics including average persistence and early dropout rates.
 
-All data preparation was performed using ProjectTemplate munge scripts, and derived datasets were saved and reused consistently to ensure reproducibility and separation between preparation and analysis stages.
+## Data Preparation (CRISP-DM Cycle 1)
+
+Data preparation involved cleaning, filtering, and aggregating learner activity records. Learners with missing country information were excluded to ensure valid country level comparisons.
+
+For each learner, the maximum step reached during the course was calculated as a measure of persistence. These learner-level metrics were then grouped by country to produce summary statistics including average persistence and early drop out rates.
+
+All preprocessing was carried out using dplyr within a ProjectTemplate structure. Cleaned datasets were saved and reused across analysis to maintain reproducibility and separation between data preparation and analysis stages. Data quality limitations, particularly small sample sizes from some countries, were acknowledged throughout the analysis.
 
 
-## 4. Analysis - Cycle 1
-The first analysis examines variation in learner persistence across countries, focusing on the ten countries with the largest learner populations to ensure meaningful comparisons. Average maximum step reached is used to summarise how far learners typically progress.
 
-The second analysis examines early dropout behaviour by comparing the proportion of learners who disengage early versus those who remain active beyond the initial steps. Countries are ordered by early dropout rate to enable direct comparison.
 
-Together, these plots provide complementary perspectives on overall persistence depth and early disengagement patterns.
+## Exploratory Analysis and Modelling (CRISP-DM Cycle 1)
 
-*Figure 1 presents the average maximum step reached by learners across the ten countries with the largest learner populations. Focusing on high-volume countries ensures that persistence comparisons are not driven by small sample sizes and highlights meaningful differences in learner engagement depth.
+The first exploratory analysis examined differences in average learner persistence across countries. To avoid misleading comparisons driven by very small samples the analysis focused on the 10 countries with the largest learner populations.
+
+Average maximum step reached was used as descriptive measure of how far learners typically progressed through the course. Visualization using gglot2 highlighted noticeable variation between countries.
+
+A second analysis explored early disengagement by comparing early dropout rates across countries. Learners were classified as early dropouts if they disengaged within the first two steps of the course. Countries were ranked by early dropout rate to highlight where disengagement occurred most rapidly.
+
+These complementary analysis provide insight into both of engagement and early stage attrition.
+
+
+
+
+*Figure 1 shows the average maximum step reached by learners across the ten countries with the most learners. Focusing on populous countries ensures that persistence comparisons are meaningful and not influenced by small sample sizes.
 
 ```{r}
 country_metrics %>%
@@ -81,9 +108,11 @@ y = "Average Maximum Step Reached"
 
 
 ```
-The figure shows substantial variation in learner persistence across countries, with some countries exhibiting consistently higher progression through the course than others.
 
-*Figure 2 decomposes learner engagement into early dropout and retained learners, allowing a clearer examination of disengagement patterns at the earliest stages of the course.
+The figure shows clear differences in learner persistence across countries, with some consistently showing higher progression through the course than others.
+
+*Figure 2 breaks down learner engagement into early dropouts and retained learners, allowing a better view of disengagement patterns at the earliest stages of the course.
+
 ```{r}
 country_metrics %>%
 arrange(desc(early_dropout_rate)) %>%
@@ -113,40 +142,77 @@ axis.ticks.y = element_blank()
 
 ```
 
-Countries with high early dropout proportions show disengagement occurring very early, suggesting that initial course structure or accessibility may present barriers to sustained participation.
+Countries with high early dropout rates show that disengagement happens very early, indicating that initial course structure or accessibility might hinder ongoing participation.
 
 
-## 5. Evaluation - Cycle 1
-The analysis reveals clear differences in learner persistence across countries. Some countries exhibit higher average progression through the course, indicating sustained engagement, while others show high early dropout rates, suggesting disengagement occurs very early.
+
+
+
+## Evaluation and Findings (CRISP-DM Cycle 1)
+
+The results indicate clear variation in learner persistence across countries. Some countries show consistently higher progression through course content, while other experience substantial dropout very early in the course.
 
 From a business perspective:
 
-High-persistence countries represent stable markets for fully online delivery
+1.High persistence countries represent stable markets for fully online course delivery.
+2.Countries with high early dropout rates may face barriers such as limited access, language challenges or unmet learner expectations.
 
-High early-dropout countries may face accessibility barriers, expectation mismatches, or insufficient early support
+While cycle one successfully identifies where persistence differs, it does not explain how provider should respond. This motivates a second CRISP-DM cycle focused on actionable stakeholder insights.
 
-These findings motivate a second investigation focused on identifying and addressing low-persistence regions.
-
-
-## Business Understanding - Cycle 2
-
-The objective of Cycle 2 is to translate persistence patterns identified in Cycle 1 into actionable insights for stakeholders. Specifically, this cycle evaluates whether countries with low learner persistence may benefit from offline or blended learning interventions aimed at improving engagement and completion.
+These findings meet the success criteria of cycle 1 by clearly identifying differences in learner persistence across countries and highlighting regions with consistently high early dropout rates. The results provide a clear evidence base for refining the business problems and motivate a second CRISP DM cycle focused on actionable stakeholder decisions.
 
 
-## Data Understanding - Cycle 2
 
-The objective of Cycle 2 is to translate persistence patterns identified in Cycle 1 into actionable insights for stakeholders. Specifically, this cycle evaluates whether countries with low learner persistence may benefit from offline or blended learning interventions aimed at improving engagement and completion.
 
-## Modelling / Analysis - Cycle 2
 
-Rather than predictive modelling, this cycle applies a rule-based segmentation approach. Countries are classified into low, medium, or high persistence categories using quantile-based thresholds applied to learner progression and early dropout rates. This approach prioritises interpretability for stakeholders.
+## Business Understanding (CRISP-DM Cycle 2)
+
+Cycle 2 reframes the business problem from description to decision support. Building on Cycle 1 findings the goal is to identify countries where low persistence suggest that alternative delivery models may be beneficial.
+
+Research Questions - Cycle 2
+
+1.Which countries can be classified as  low, medium or High persistence based on engagement metrics?
+2.Which low persistence country should be prioritized for targeted offline or blended learning interventions?
+
+Cycle 2 directly extends Cycle 1 by operationalizing persistence patterns into categories meaningful for stakeholders.
+
+
+
+
+## Data Understanding (CRISP-DM Cycle 2)
+
+Cycle 2 uses the same prepared data sets as cycle 1 but introduces derived persistence categories. No new raw data sources were added; instead, the focus shifted to reinterpreting existing metrics in a decision oriented context.
+
+Further inspection highlighted that some countries have extremely small learner counts, reinforcing the need for cautious interpretation of results.
+
+
+
+
+## Data Preparation (CRISP-DM Cycle 2)
+
+Additional preparation involved creating rule based persistence categories using quantile thresholds derived from average maximum step and early dropout rates. Countries were classified as low, medium, or high persistence.
+
+These transformations were intentionally simple and transparent to ensure interpretability for nontechnical stakeholders.
+
+
+
+
+## Exploratory Analysis and Modelling (CRISP-DM Cycle 2)
+
+Cycle 2 analysis focused on visualizing persistence categories and relationships between engagement depth and early dropout.
+
+Bar chart summarized average learner progression by country and persistence category, Highlighting low persistence regions. Scatter plots further illustrated the relationship between progression and early disengagement across categories.
+
+Rather than predictive modelling, a segmentation based approach was chosen to prioritize clarity and business relevance.
 
 ```{r}
 country_cycle2
 ```
+
 ## Results and Visualisation - Cycle 2
 
-*Figure 3 summarises average learner progression by country, segmented by persistence category. This visualisation highlights countries identified as low persistence and supports stakeholder prioritisation of intervention targets.
+*Figure 3 summarizes average learner progression by country, grouped by persistence category. This visualisation highlights countries identified as low persistence and aids stakeholders in prioritizing intervention targets.
+
 ```{r}
 ggplot(
 country_cycle2,
@@ -165,8 +231,8 @@ y = "Average Maximum Step Reached"
 
 ```
 
+ *Figure 4 shows the relationship between average learner progression and early dropout rates, providing another look at engagement dynamics across different persistence categories.
 
-*Figure 4 illustrates the relationship between average learner progression and early dropout rates, providing a complementary view of engagement dynamics across persistence categories.
 ```{r}
 ggplot(
 country_cycle2,
@@ -182,24 +248,65 @@ y = "Early Dropout Rate"
 )
 ```
 
+*Table 1 lists countries classified as low persistence, which are priority candidates for targeted offline or blended learning interventions.
 
-*Table 1 lists countries classified as low persistence, representing priority candidates for targeted offline or blended learning interventions.
 ```{r}
 low_persistence_countries
 ```
 
 
-## Evaluation - Cycle 2
-Countries classified as low persistence exhibit both low average learner progression and high early dropout rates. These patterns suggest the presence of structural or contextual barriers rather than a lack of learner interest.
+
+
+## Evaluation and Findings (CRISP-DM Cycle 2)
+
+Countries classified as low persistence exhibit both average progression and high early dropouts. These patterns suggest structural or contextual barriers rather than a lack of learner interest.
+
+Comparing both cycles show a clear progression:
+
+1.Cycle 1 identifies where engagement differs.
+2.Cycle 2 translates those differences into prioritized intervention targets.
+
+Despite improvements in stakeholder relevance, limitations related to data granularity and sample size remain.
+
+
 
 
 ## Deployment and Recommendations
-It is recommended that course providers pilot offline or blended learning initiatives in selected low-persistence countries identified in this analysis. Cycle 1 persistence metrics should be retained as a baseline, and the same analytical framework reapplied post-intervention to evaluate changes in learner engagement, dropout rates, and potential revenue impact.
+
+It is suggested that course providers test offline or blended learning initiatives in selected low-persistence countries identified in this analysis. Cycle 1 persistence metrics should be kept as a baseline, and the same analytical method should be reapplied post-intervention to assess changes in learner engagement, dropout rates, and potential revenue impact.
 
 
 
 
+## Discussion
+
+Overall, The analysis demonstrates how learner engagement varies substantially across countries within a single MOOC. The two cycle CRISP DM approach allows initial descriptive insights to evolve into practical recommendations.
+
+Methodological choices emphasized transparency, reproducibility and interpretability. Rather than complex models, the analysis prioritized stakeholder friendly metrics aligned into real decision making contexts.
 
 
+
+
+## Reproducibility and Best Practice
+
+The analysis follows established data science best practices. ProjectTemplate was used to enforce a clear project structure and separation of concerns. Git version control enable tracking of analytical change over time, while renv ensured consistent package versions.
+
+The report was produced using R Markdown, allowing code, results, and interpretation to remain tightly integrated. These practices reflect real world analytical workflows and support reproducibility and auditability.
+
+
+
+
+## Conclusion
+
+This report analyzed learner persistence by country using FutureLearn MOOC data across two CRISP DM cycles. The findings highlight substantial variation in engagement patterns and identify countries where early disengagement is particularly pronounced.
+
+By progressing from descriptive analysis to actionable segmentation, the report demonstrates how learning analytics can support strategic decisions for course providers.
+
+
+
+
+## Limitations and Future Work
+
+The analysis is limited by missing country information, imbalanced sample sizes and use of step completion as proxy for engagement. Future work could incorporate demographic variables, temporal engagement patterns or post intervention data to assess the effectiveness of blended learning strategies.
 
 
