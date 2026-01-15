@@ -92,26 +92,24 @@ These complementary analysis provide insight into both of engagement and early s
 
 
 
-*Figure 1 shows the average maximum step reached by learners across the ten countries with the most learners. Focusing on populous countries ensures that persistence comparisons are meaningful and not influenced by small sample sizes.
+*Figure 1 shows the average maximum step reached by learners across the ten countries with most learnerss. Focusing on popular countries ensures that persistent comparison are meaningful and not influenced by small sample sizes.
 
 ```{r}
 country_metrics %>%
-slice_max(learners, n = 10) %>%
-ggplot(aes(x = reorder(country, avg_max_step), y = avg_max_step)) +
+slice_max(learners, n=10) %>%
+ggplot(aes(x = reorder(country,avg_max_step),y = avg_max_step)) +
 geom_boxplot() +
 coord_flip() +
 labs(
-title = "Variation in Learner Persistence Across Countries",
-x = "Country",
-y = "Average Maximum Step Reached"
+title = "Variation in Learner Persistence across Countries",
+x = "country",
+y = "Average maximum step reached"
 )
-
-
 ```
 
-The figure shows clear differences in learner persistence across countries, with some consistently showing higher progression through the course than others.
+The figure shows clear difference in learner persistence across countries with some consistently showing higher progression through the course than others..
 
-*Figure 2 breaks down learner engagement into early dropouts and retained learners, allowing a better view of disengagement patterns at the earliest stages of the course.
+*Figure 2 breaks down linear engagement into early dropouts and retained learners allowing a better view of disengagement patterns at the early stage of the course.
 
 ```{r}
 country_metrics %>%
@@ -128,21 +126,21 @@ names_to = "status",
 values_to = "proportion"
 ) %>%
 ggplot(aes(x = country, y = proportion, fill = status)) +
-geom_col() +
-coord_flip() +
+geom_col()+
+coord_flip()+
 labs(
-title = "Early Dropout vs Retained Learners by Country",
+title = "Early dropout vs retained learners by country",
 x = "Country",
 y = "Proportion of Learners"
-) +
+)+
+
 theme(
 axis.text.y = element_blank(),
 axis.ticks.y = element_blank()
 )
-
 ```
 
-Countries with high early dropout rates show that disengagement happens very early, indicating that initial course structure or accessibility might hinder ongoing participation.
+Countries with early dropout rates show that disengagement happens very early indicating that initial core structure or accessibility might create problem in the ongoing participation.
 
 
 
@@ -248,7 +246,7 @@ y = "Early Dropout Rate"
 )
 ```
 
-*Table 1 lists countries classified as low persistence, which are priority candidates for targeted offline or blended learning interventions.
+*Table 1 list countries classified as low persistence, which are priority candidates for targeting for targeted high offline or blended learning interventions
 
 ```{r}
 low_persistence_countries
